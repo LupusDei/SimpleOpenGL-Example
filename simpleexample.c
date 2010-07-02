@@ -7,16 +7,19 @@
 
 typedef GLfloat point[3]; 
 
-point v[4] ={{0.0, 0.0, 1.0}, 
-             {0.0, 0.942809, -0.333333}, 
-             {-0.816497, -0.471405, -0.333333}, 
-             {0.816497, -0.471405, -0.333333}};
-
-
+point s[8] ={	{0,0,0},
+							{0,0,0.5},
+							{0,0.5,0},
+							{0,0.5,0.5},
+							{0.5,0,0},
+							{0.5,0,0.5},
+							{0.5,0.5,0},
+							{0.5,0.5,0.5}};
 GLvoid DrawGLScene(void);
-void tetrahedron(void);
-void triangle(point a, point b, point c);
 
+void square(point a, point b, point c, point d);
+void cube(void);
+void axis(void);
 int main(int argc, char **argv)
 {
   glutInit(&argc, argv);
@@ -24,9 +27,7 @@ int main(int argc, char **argv)
   glutInitWindowSize(kWindowWidth, kWindowHeight);
   glutInitWindowPosition(100, 100);
   glutCreateWindow ("simple opengl example");
-
   glutDisplayFunc(DrawGLScene);
-
   glutMainLoop();
   return 0;
 }
@@ -36,23 +37,46 @@ GLvoid DrawGLScene(void)
   glClear(GL_COLOR_BUFFER_BIT); 
   glColor3f(1.0,1.0,1.0); 
   glLoadIdentity(); 
-
-  tetrahedron(); 
+	glRotated(45,1,1,1);
+	cube();
   glutSwapBuffers();
 }
-
-void triangle( point a, point b, point c) 
-{ 
-  glBegin(GL_LINE_LOOP);
-  glVertex3fv(a); 
-  glVertex3fv(b); 
-  glVertex3fv(c); 
-  glEnd(); 
+void cube(void)
+{
+	square(s[0],s[1],s[3],s[2]);
+	square(s[0],s[4],s[6],s[2]);
+	square(s[0],s[4],s[5],s[1]);
+	square(s[7],s[6],s[4],s[5]);
+	square(s[7],s[3],s[1],s[5]);
+//	square(s[7],s[3],s[5],s[1]);
 }
 
-void tetrahedron(void) 
-{ 
-  triangle(v[0], v[1], v[2]); 
-  triangle(v[3], v[2], v[1]); 
-  triangle(v[0], v[2], v[3]); 
-} 
+void square(point a, point b, point c, point d)
+{
+	glBegin(GL_LINE_LOOP);
+  glVertex3fv(a); 
+  glVertex3fv(b); 
+  glVertex3fv(c);
+	glVertex3fv(d); 
+  glEnd();
+}
+
+void axis(void)
+{
+	point a[4] ={	{0,0,0},
+								{2,0,0},
+								{0,2,0},
+								{0,0,2}};
+	glBegin(GL_LINE_LOOP);
+  glVertex3fv(a[0]); 
+  glVertex3fv(a[1]); 
+  glEnd();
+	glBegin(GL_LINE_LOOP);
+  glVertex3fv(a[0]); 
+  glVertex3fv(a[2]); 
+  glEnd();
+	glBegin(GL_LINE_LOOP);
+  glVertex3fv(a[0]); 
+  glVertex3fv(a[3]); 
+  glEnd();
+}
