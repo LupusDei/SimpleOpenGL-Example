@@ -39,6 +39,7 @@ GLvoid DrawGLScene(void)
   glLoadIdentity(); 
 	glRotated(45,1,1,1);
 	cube();
+	glutWireCube(-0.5);
   glutSwapBuffers();
 }
 void cube(void)
@@ -48,7 +49,6 @@ void cube(void)
 	square(s[0],s[4],s[5],s[1]);
 	square(s[7],s[6],s[4],s[5]);
 	square(s[7],s[3],s[1],s[5]);
-//	square(s[7],s[3],s[5],s[1]);
 }
 
 void square(point a, point b, point c, point d)
