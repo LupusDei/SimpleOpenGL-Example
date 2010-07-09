@@ -1,82 +1,92 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <Glut/glut.h>
+#include <stdio.h>
 
-#define kWindowWidth 400
-#define kWindowHeight 300
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+#define WINDOW_X 100
+#define WINDOW_Y 100
 
 typedef GLfloat point[3]; 
 
-point s[8] ={	{0,0,0},
-							{0,0,0.5},
-							{0,0.5,0},
-							{0,0.5,0.5},
-							{0.5,0,0},
-							{0.5,0,0.5},
-							{0.5,0.5,0},
-							{0.5,0.5,0.5}};
-GLvoid DrawGLScene(void);
+void DrawGLScene(void);
+void ChangeSize(GLsizei w, GLsizei h);
+GLvoid pressZoomKey(int key, int x, int y);
 
-void square(point a, point b, point c, point d);
-void cube(void);
-void axis(void);
+int frame = 0;
+float zDist= 0;
+
 int main(int argc, char **argv)
 {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-  glutInitWindowSize(kWindowWidth, kWindowHeight);
-  glutInitWindowPosition(100, 100);
-  glutCreateWindow ("simple opengl example");
+  glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+  glutInitWindowPosition(WINDOW_X, WINDOW_Y);
+  glutCreateWindow("simple opengl example");
+
   glutDisplayFunc(DrawGLScene);
+  // NEW
+  glutReshapeFunc(ChangeSize);
+	glutSpecialFunc(pressZoomKey);
+	zDist = -10;
   glutMainLoop();
   return 0;
 }
 
-GLvoid DrawGLScene(void)
+void DrawGLScene(void)
 {
-  glClear(GL_COLOR_BUFFER_BIT); 
-  glColor3f(1.0,1.0,1.0); 
-  glLoadIdentity(); 
-	glRotated(45,1,1,1);
-	cube();
-	glutWireCube(-0.5);
-  glutSwapBuffers();
-}
-void cube(void)
-{
-	square(s[0],s[1],s[3],s[2]);
-	square(s[0],s[4],s[6],s[2]);
-	square(s[0],s[4],s[5],s[1]);
-	square(s[7],s[6],s[4],s[5]);
-	square(s[7],s[3],s[1],s[5]);
+	glClear(GL_COLOR_BUFFER_BIT);
+		glNormal3d(0, 0, 1);
+		
+		
+		glPushMatrix();
+		glTranslatef(0.0, 0.0, zDist);
+		glRotatef(30, 1.0, 1.0, 0.0);
+
+		glutWireCube(1);
+		glutWireCube(2);
+		glutWireCube(4);
+		glutWireCube(8);
+		glutWireCube(16);
+		glutWireCube(32);
+		glutWireCube(64);
+		glutWireCube(128);
+		glutWireCube(256);
+		glPopMatrix();
+		glutSwapBuffers();
 }
 
-void square(point a, point b, point c, point d)
+void ChangeSize(GLsizei w, GLsizei h)
 {
-	glBegin(GL_LINE_LOOP);
-  glVertex3fv(a); 
-  glVertex3fv(b); 
-  glVertex3fv(c);
-	glVertex3fv(d); 
-  glEnd();
+
+  // Prevent a divide by zero
+  if(h == 0)
+    h = 1;
+
+  glViewport(0, 0, w, h);
+
+  // Reset coordinate system
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+
+  gluPerspective(60.0f, w/h, 1.0, 1000.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
 }
 
-void axis(void)
+void pressZoomKey(int key, int x, int y)
 {
-	point a[4] ={	{0,0,0},
-								{2,0,0},
-								{0,2,0},
-								{0,0,2}};
-	glBegin(GL_LINE_LOOP);
-  glVertex3fv(a[0]); 
-  glVertex3fv(a[1]); 
-  glEnd();
-	glBegin(GL_LINE_LOOP);
-  glVertex3fv(a[0]); 
-  glVertex3fv(a[2]); 
-  glEnd();
-	glBegin(GL_LINE_LOOP);
-  glVertex3fv(a[0]); 
-  glVertex3fv(a[3]); 
-  glEnd();
+	switch(key)
+	{
+		case GLUT_KEY_UP : 
+			zDist -= 1;
+			break;
+		case GLUT_KEY_DOWN : 
+			zDist += 1;
+			break;
+	}
+	glLoadIdentity();
+		glutPostRedisplay();
 }
+
